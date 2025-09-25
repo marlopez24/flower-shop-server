@@ -38,4 +38,22 @@ router.put("/:id/status", async (req, res) => {
   res.json(order);
 });
 
+router.delete("/:id/remove", async (req, res) => {
+  console.log("DELETE request received for ID:", req.params.id);
+  try {
+    const deletedOrder = await Order.findByIdAndDelete(req.params.id);
+    if (!deletedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    res.json({ message: "Order deleted succesfully", order: deletedOrder });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.use((req, res) => {
+  console.log("Unmatched request in orderRoutes:", req.method, req.originalUrl);
+  res.status(404).json({ error: "Route not found in orderRoutes" });
+});
+
 export default router;
