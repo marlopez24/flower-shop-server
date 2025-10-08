@@ -1,12 +1,12 @@
 import express from "express";
-const router = express.Router();
 import Order from "../models/Order.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
-console.log("✅ orderRoutes.js loaded");
+const router = express.Router();
 
 router.get("/test", (req, res) => res.send("Test route working"));
 
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   const orders = await Order.find();
   res.json(orders);
 });
@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id/status", async (req, res) => {
+router.put("/:id/status", authMiddleware, async (req, res) => {
   const { status } = req.body;
   const order = await Order.findByIdAndUpdate(
     req.params.id,
@@ -38,7 +38,7 @@ router.put("/:id/status", async (req, res) => {
   res.json(order);
 });
 
-router.delete("/:id/remove", async (req, res) => {
+router.delete("/:id/remove", authMiddleware, async (req, res) => {
   console.log("DELETE request received for ID:", req.params.id);
   try {
     const deletedOrder = await Order.findByIdAndDelete(req.params.id);

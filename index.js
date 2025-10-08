@@ -3,11 +3,10 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import orderRoutes from "./routes/orderRoutes.js";
+import authRoutes from ".routes/authRoutes.js";
 
 dotenv.config();
 const app = express();
-
-console.log("✅ index.js loaded");
 
 // Middleware
 app.use(cors());
@@ -19,7 +18,7 @@ app.use((req, res, next) => {
 });
 // Mount routes
 app.use("/api/orders", orderRoutes);
-console.log("✅ Mounted orderRoutes at /api/orders");
+app.use("api/auth", authRoutes);
 
 // Test root
 app.get("/", (req, res) => res.send("Server is running"));
