@@ -6,40 +6,70 @@ const router = express.Router();
 
 router.get("/test", (req, res) => res.send("Test route working"));
 
+// most are admin and user actions
+
 router.get("/", authMiddleware, async (req, res) => {
-  const orders = await Order.find();
-  res.json(orders);
+  try {
+    const orders = await Order.find();
+
+    if (orders.length === 0) {
+      return res.json([]);
+    }
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 });
 
+// not in use
+router.get("/:id", authMiddleware, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      res.status(404).json({ message: "Order detail not found" });
+    }
+    res.json(orderId);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+//  user actions
 router.post("/", async (req, res) => {
   try {
-    const { name, email, address, items } = req.body;
+    const { name, email, address, phone, items } = req.body;
     const newOrder = new Order({
-      customer: { name, email, address },
+      customer: { name, email, address, phone },
       cart: items,
     });
-    console.log("Saving order:", newOrder);
+
     const saved = await newOrder.save();
     res.status(201).json(saved);
-  } catch {
+  } catch (err) {
     console.error("Error saving order:", err);
     res.status(500).json({ error: "Failed to save order" });
   }
 });
 
 router.put("/:id/status", authMiddleware, async (req, res) => {
-  const { status } = req.body;
-  const order = await Order.findByIdAndUpdate(
-    req.params.id,
-    { status },
-    { new: true }
-  );
-  if (!order) return res.status(404).json({ message: "Order not found" });
-  res.json(order);
+  try {
+    const { status } = req.body;
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true },
+    );
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
+// admin action only I think
 router.delete("/:id/remove", authMiddleware, async (req, res) => {
-  console.log("DELETE request received for ID:", req.params.id);
   try {
     const deletedOrder = await Order.findByIdAndDelete(req.params.id);
     if (!deletedOrder) {
@@ -49,11 +79,6 @@ router.delete("/:id/remove", authMiddleware, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
-
-router.use((req, res) => {
-  console.log("Unmatched request in orderRoutes:", req.method, req.originalUrl);
-  res.status(404).json({ error: "Route not found in orderRoutes" });
 });
 
 export default router;

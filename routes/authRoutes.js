@@ -1,14 +1,14 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-const router = express.Router();
 import User from "../models/User.js";
 
+const router = express.Router();
 // POST route for workers
 
 router.post("/register", async (req, res) => {
   try {
-    const { username, password, role } = req.body;
+    const { username, password } = req.body;
 
     const existing = await User.findOne({ username });
     if (existing) return res.status(400).json({ error: "User already exists" });
@@ -18,7 +18,6 @@ router.post("/register", async (req, res) => {
     const newUser = new User({
       username,
       passwordHash,
-      role,
     });
     await newUser.save();
 
@@ -43,9 +42,9 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, username: user.username, role: user.role },
+      { id: user._id, username: user.username },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     res.json({ token });
@@ -53,3 +52,5 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+export default router;
