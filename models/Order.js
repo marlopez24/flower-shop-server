@@ -6,6 +6,11 @@ const orderSchema = new mongoose.Schema({
     email: String,
     address: String,
     phone: String,
+    customSize: String,
+    customColors: String,
+    customFlowers: String,
+    occasion: String,
+    customNotes: String,
   },
   cart: [
     {
@@ -16,7 +21,11 @@ const orderSchema = new mongoose.Schema({
   status: {
     type: String,
     default: "Pending",
-    enum: ["Pending", "In-Progress", "Ready", "Completed"],
+    enum: ["Pending", "In Progress", "Ready", "Completed"],
+  },
+  paymentStatus: {
+    type: String,
+    default: "Awaiting Payment",
   },
 });
 

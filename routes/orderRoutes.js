@@ -38,9 +38,30 @@ router.get("/:id", authMiddleware, async (req, res) => {
 //  user actions
 router.post("/", async (req, res) => {
   try {
-    const { name, email, address, phone, items } = req.body;
+    const {
+      name,
+      email,
+      address,
+      phone,
+      items,
+      customSize,
+      customColors,
+      customFlowers,
+      occasion,
+      customNotes,
+    } = req.body;
     const newOrder = new Order({
-      customer: { name, email, address, phone },
+      customer: {
+        name,
+        email,
+        address,
+        phone,
+        customSize,
+        customColors,
+        customFlowers,
+        occasion,
+        customNotes,
+      },
       cart: items,
     });
 
