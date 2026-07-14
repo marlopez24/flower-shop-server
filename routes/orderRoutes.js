@@ -89,6 +89,23 @@ router.put("/:id/status", authMiddleware, async (req, res) => {
   }
 });
 
+router.put("/:id/payment", authMiddleware, async (req, res) => {
+  try {
+    const { paymentStatus } = req.body;
+    const updatedPaymentStatus = await Order.findByIdAndUpdate(
+      req.params.id,
+      { paymentStatus },
+      { new: true },
+    );
+    if (!updatedPaymentStatus)
+      return res.status(404).json({ message: "Payment error" });
+
+    res.json(updatedPaymentStatus);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update payment status" });
+  }
+});
+
 // admin action only I think
 router.delete("/:id/remove", authMiddleware, async (req, res) => {
   try {
